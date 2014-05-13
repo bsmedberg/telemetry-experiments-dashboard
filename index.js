@@ -76,6 +76,12 @@ function setupInstallRatio(eid, section) {
     });
 
   var maxPct = d3.max(data, function(d) { return d.c / d.total; });
+  console.log("maxPct", maxPct);
+  if (maxPct == 0) {
+    section.select(".installRatioContainer").style("display", "none");
+    return;
+  }
+  section.select(".installRatioContainer").style("display", "block");
 
   var dims = new Dimensions({
     height: 120,
@@ -129,7 +135,7 @@ function setupInstallRatio(eid, section) {
     .data(data)
     .enter().append("circle")
     .attr({
-      class: "point",
+      "class": "point",
       "cx": function(d) { return xscale(d.date); },
       "cy": function(d) { return yscale(d.c / d.total); },
       "r": 3,
@@ -241,7 +247,7 @@ function doGraph() {
     .append("section").classed("experiment", true).attr("id", function(d) { return "exp-" + d; });
   newsections.append("h2").text(identity);
   newsections.append("h3").text("Install Ratio");
-  newsections.append("p").append("svg").classed("installRatio", true);
+  newsections.append("p").attr("class", "installRatioContainer").append("svg").classed("installRatio", true);
   newsections.append("h3").text("Activation Counts");
   newsections.append("p").append("table").classed("activationTable", true)
     .html("<thead><tr><td>Date<td>#<tbody>");
