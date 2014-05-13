@@ -1,0 +1,1 @@
+This is a dashboard to track the deployment of Firefox Telemetry Experiments. Data is pulled from nightly aggregations of telemetry pings stored in S3. The aggregation scripts are located at https://github.com/bsmedberg/telemetry-server/tree/telex-logging/mapreduce/experiments/
