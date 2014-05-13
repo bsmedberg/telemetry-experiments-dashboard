@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <title>Firefox Telemetry Experiments - Deployment &amp; Monitoring</title>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+    section.experiment {
+      border: 1px solid #999;
+      border-radius: 5px;
+      padding: 4px;
+      margin: 4px;
+    }
+    section.experiment > :first-child {
+      margin-top: 0px;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #999;
+    }
+  </style>
+
+<body>
+  <h1>Firefox Telemetry Experiments - Deployment &amp; Monitoring</h1>
+
+  <p><label for="startDate">Last Date:</label><input type="date" id="startDate"> <span id="parsedStartDate"></span><br>
+      <label for="endDate">First Date:</label><input type="date" id="endDate"> <span id="parsedEndDate"></span>
+
+  <p id="channelGroup">Release channel:
+    <input type="radio" name="channel" value="nightly" id="channel-nightly" checked><label for="channel-nightly">Nightly</label>
+    <input type="radio" name="channel" value="aurora" id="channel-aurora"><label for="channel-aurora">Aurora</label>
+    <input type="radio" name="channel" value="beta" id="channel-beta"><label for="channel-beta">Beta</label>
+    <input type="radio" name="channel" value="release" id="channel-release"><label for="channel-release">Release</label>
+
+  <section id="data">
+  </section>
+
+  <script src="d3.v3.min.js"></script>
+  <script src="utils.js"></script>
+  <script src="index.js"></script>
