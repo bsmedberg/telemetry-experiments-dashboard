@@ -8,7 +8,7 @@ var gDateFormat = d3.time.format.utc("%Y%m%d");
 
 d3.select("#channelGroup").on("change", channelChange);
 function channelChange() {
-  gChannel = d3.select('input[value="nightly"]:checked').property("value");
+  gChannel = d3.select('input[name="channel"]:checked').property("value");
   gData = d3.map();
   dateChange();
 }
@@ -85,7 +85,6 @@ function setupInstallRatio(eid, section) {
     });
 
   var maxPct = d3.max(data, function(d) { return d.c / d.total; });
-  console.log("maxPct", maxPct);
   if (maxPct == 0) {
     section.select(".installRatioContainer").style("display", "none");
     return;
@@ -279,5 +278,24 @@ function doGraph() {
   });
 }
 
-// Now kick everything off
+// Now kick everything off. Initialize values from the hash string
+var hash = document.location.hash;
+if (hash.length) {
+  hash.slice(1).split("&").forEach(function(item) {
+    var r = /^(.*?)(=(.*))?$/.exec(item);
+    var key = unescape(r[1]);
+    var val = unescape(r[3]);
+    switch (key) {
+      case "channel":
+        d3.selectAll('input[name="channel"]').filter(function() {
+          return d3.select(this).property("value") == val;
+        }).property("checked", true);
+        break;
+      case "startDate":
+      case "endDate":
+        d3.select("#" + key).property("value", val);
+      }
+  });
+}
+
 channelChange();
