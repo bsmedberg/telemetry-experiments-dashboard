@@ -65,7 +65,16 @@ function setupInstallRatio(eid, section) {
       var day = gData.get(d);
       var c = 0;
       if (eid in day.experiments) {
-        c = day.experiments[eid].active;
+        var active = day.experiments[eid].active;
+        if ((typeof active) == "number") {
+          // old-style data just counted .active
+          c += active;
+        } else {
+          // new-style data has branches
+          Object.keys(active).forEach(function(branch) {
+            c += active[branch];
+          });
+        }
       }
       return {
         date: gDateFormat.parse(d),
@@ -106,7 +115,7 @@ function setupInstallRatio(eid, section) {
   var yaxis = d3.svg.axis()
     .scale(yscale)
     .orient("left")
-    .tickFormat(d3.format("%"))
+    .tickFormat(d3.format(".2p"))
     .ticks(5);
 
   var svgg = section.select(".installRatio").text('')
@@ -140,7 +149,7 @@ function setupInstallRatio(eid, section) {
       "cy": function(d) { return yscale(d.c / d.total); },
       "r": 3,
       "fill": "black",
-      "title": function(d) { return "Date: " + d.datestr + " Count: " + d.c + " Total: " + d.total + " (" + d3.format("%")(d.c / d.total) + ")"; }
+      "title": function(d) { return "Date: " + d.datestr + " Count: " + d.c + " Total: " + d.total + " (" + d3.format(".2p")(d.c / d.total) + ")"; }
     });
 }
 
