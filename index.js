@@ -27,6 +27,8 @@ function dateIsValid(d) {
 
 function initAndFetch() {
   gChannel = d3.select('input[name="channel"]:checked').property("value");
+  d3.select("#channelHead").text(gChannel + " channel");
+
   gData = d3.map();
 
   var startDate = valueToDate(d3.select("#startDate").property("value"), -1);
