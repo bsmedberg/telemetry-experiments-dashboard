@@ -5,31 +5,45 @@ var gChannel;
 var gData;
 
 var gDateFormat = d3.time.format.utc("%Y%m%d");
+var gPrettyDate = d3.time.format.utc("%Y-%m-%d");
 
-d3.select("#channelGroup").on("change", channelChange);
-function channelChange() {
-  gChannel = d3.select('input[name="channel"]:checked').property("value");
-  gData = d3.map();
-  dateChange();
+function valueToDate(v, defaultDelta) {
+  if (v == "") {
+    return dateAdd(new Date(), defaultDelta * MS_PER_DAY);
+  }
+  return new Date(v);
 }
 
-d3.select("#startDate").on("change", dateChange);
-d3.select("#endDate").on("change", dateChange);
-
-function dateChange() {
-  var startDate = new Date(d3.select("#startDate").property("value"));
-  if (isNaN(startDate.getTime())) {
-    startDate = new Date();
+function dateIsValid(d) {
+  if (isNaN(d.getTime())) {
+    return false;
   }
-  gStartDate = gDateFormat(startDate),
-  d3.select("#parsedStartDate").text(gStartDate);
+  if (new Date("2014-04-01") > d ||
+      new Date(Date.now() + 1000 * 60 * 60 * 24 * 2) < d) {
+    return false;
+  }
+  return true;
+}
 
-  var endDate = new Date(d3.select("#endDate").property("value"));
-  if (isNaN(endDate.getTime())) {
-    endDate = dateAdd(startDate, -14 * MS_PER_DAY);
+function initAndFetch() {
+  gChannel = d3.select('input[name="channel"]:checked').property("value");
+  gData = d3.map();
+
+  var startDate = valueToDate(d3.select("#startDate").property("value"), -1);
+  if (!dateIsValid(startDate)) {
+    d3.select("#parsedStartDate").text("Invalid!").style("color", "red");
+    return;
+  }
+  gStartDate = gDateFormat(startDate);
+  d3.select("#parsedStartDate").text(gPrettyDate(startDate));
+
+  var endDate = valueToDate(d3.select("#endDate").property("value"), -15);
+  if (!dateIsValid(endDate)) {
+    d3.select("#parsedEndDate").text("Invalid!").style("color", "red");
+    return;
   }
   gEndDate = gDateFormat(endDate),
-  d3.select("#parsedEndDate").text(gEndDate);
+  d3.select("#parsedEndDate").text(gPrettyDate(endDate));
 
   fetchDates();
 }
@@ -257,17 +271,19 @@ function doGraph() {
   newsections.append("h3").text("Install Ratio");
   newsections.append("p").attr("class", "installRatioContainer").append("svg").classed("installRatio", true);
   newsections.append("h3").text("Activation Counts");
-  newsections.append("p").append("table").classed("activationTable", true)
+  newsections.append("p").append("table")
+    .classed({"activationTable": true, "data": true})
     .html("<thead><tr><td>Date<td>#<tbody>");
-  // newsections.append("p").append("svg").classed("activationCounts", true);
   newsections.append("h3").text("Failed Activations");
-  newsections.append("p").append("table").classed("failedTable", true)
+  newsections.append("p").append("table")
+    .classed({"failedTable": true, "data": true})
     .html("<thead><tr><td>Reason<td>#<tbody>");
   newsections.append("h3").text("Terminations");
-  // newsections.append("p").append("svg").classed("terminationCounts", true);
-  newsections.append("p").append("table").classed("termTable", true)
+  newsections.append("p").append("table")
+    .classed({"termTable": true, "data": true})
    .html("<thead><tr><td>Date<td>#<tbody>");
-  newsections.append("p").append("table").classed("termReasonsTable", true)
+  newsections.append("p").append("table")
+    .classed({"termReasonsTable": true, "data": true})
    .html("<thead><tr><td>Reason<td>#<tbody>");
 
   sections.each(function(eid) {
@@ -278,13 +294,13 @@ function doGraph() {
   });
 }
 
-// Now kick everything off. Initialize values from the hash string
-var hash = document.location.hash;
-if (hash.length) {
-  hash.slice(1).split("&").forEach(function(item) {
+// Now kick everything off. Initialize values from the query string
+var params = document.location.search;
+if (params.length) {
+  params.slice(1).split("&").forEach(function(item) {
     var r = /^(.*?)(=(.*))?$/.exec(item);
-    var key = unescape(r[1]);
-    var val = unescape(r[3]);
+    var key = decodeURIComponent(r[1]);
+    var val = decodeURIComponent(r[3]);
     switch (key) {
       case "channel":
         d3.selectAll('input[name="channel"]').filter(function() {
@@ -298,4 +314,17 @@ if (hash.length) {
   });
 }
 
-channelChange();
+initAndFetch();
+
+d3.select("#setupForm").on("submit", function() {
+  var d = valueToDate(d3.select("#startDate").property("value"), -1);
+  if (!dateIsValid(d)) {
+    alert("Last date is invalid.");
+    d3.event.preventDefault();
+  }
+  d = valueToDate(d3.select("#endDate").property("value"), -15);
+  if (!dateIsValid(d)) {
+    alert("First date is invalid!");
+    d3.event.preventDefault();
+  }
+});

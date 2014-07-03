@@ -5,7 +5,29 @@
   <style type="text/css">
     body {
       font-family: sans-serif;
+      background: white;
+      color: black;
+      margin: 5px;
     }
+
+    #setupForm {
+      padding: 8px;
+      border: 1px solid #999;
+      border-radius: 5px;
+    }
+
+    @media (min-width: 900px) {
+      body {
+        padding-right: 450px;
+      }
+      #sidebar {
+        position: absolute;
+        right: 5px;
+        width: 440px;
+        top: 5px;
+      }
+    }
+
     section.experiment {
       border: 1px solid #999;
       border-radius: 5px;
@@ -20,19 +42,65 @@
       fill: none;
       stroke: #999;
     }
+
+    table.data {
+      border-collapse: collapse;
+    }
+    table.data td,
+    table.data th {
+      border: 1px solid #999;
+      padding: 2px;
+      margin: 0px;
+    }
+    table.data thead tr {
+      background-color: #666;
+      color: white;
+    }
+    table.data tbody tr:nth-child(2n) {
+      background-color: #DDD;
+      color: black;
+    }
   </style>
 
 <body>
   <h1>Firefox Telemetry Experiments - Deployment &amp; Monitoring</h1>
 
-  <p><label for="startDate">Last Date:</label><input type="date" id="startDate"> <span id="parsedStartDate"></span><br>
-      <label for="endDate">First Date:</label><input type="date" id="endDate"> <span id="parsedEndDate"></span>
+  <section id="sidebar">
+  <form id="setupForm" action="#" method="GET">
+    <p><label for="startDate">Last Date:</label><input type="date" id="startDate" name="startDate" placeholder="YYYY-MM-DD"> <span id="parsedStartDate"></span><br>
+      <label for="endDate">First Date:</label><input type="date" id="endDate" name="endDate" placeholder="YYYY-MM-DD"> <span id="parsedEndDate"></span>
 
-  <p id="channelGroup">Release channel:
-    <input type="radio" name="channel" value="nightly" id="channel-nightly" checked><label for="channel-nightly">Nightly</label>
-    <input type="radio" name="channel" value="aurora" id="channel-aurora"><label for="channel-aurora">Aurora</label>
-    <input type="radio" name="channel" value="beta" id="channel-beta"><label for="channel-beta">Beta</label>
-    <input type="radio" name="channel" value="release" id="channel-release"><label for="channel-release">Release</label>
+    <p id="channelGroup">Release channel:
+      <input type="radio" name="channel" value="nightly" id="channel-nightly"><label for="channel-nightly">Nightly</label>
+      <input type="radio" name="channel" value="aurora" id="channel-aurora"><label for="channel-aurora">Aurora</label>
+      <input type="radio" name="channel" value="beta" id="channel-beta" checked><label for="channel-beta">Beta</label>
+      <input type="radio" name="channel" value="release" id="channel-release"><label for="channel-release">Release</label>
+    <p><input type="submit" value="Go">
+  </form>
+
+  <section id="legend">
+    <h2>Glossary</h2>
+    <dl>
+      <dt>Install Ratio
+      <dd>Ratio of session with an active experiment to total sessions
+        for each day.
+
+      <dt>Activation Counts
+      <dd>How many new users were enrolled in the experiment each day.
+
+      <dt>Failed Activations
+      <dd>Table of reasons why users were not enrolled in an experiment. This
+        can expected conditions such as the channel, date
+        ranges, and other experiment conditions. It can also list unexpected
+        exceptions or install failure running the experiment.
+
+      <dt>Terminations
+      <dd>Table of users departing an experiment per day. There is also a
+        table of reasons users departed an experiment.
+    </dl>
+  </section>
+
+  </section>
 
   <section id="data">
   </section>
