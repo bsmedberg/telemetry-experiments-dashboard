@@ -6,6 +6,7 @@ var gData;
 
 var gDateFormat = d3.time.format.utc("%Y%m%d");
 var gPrettyDate = d3.time.format.utc("%Y-%m-%d");
+var gPctFormat = d3.format("%");
 
 function valueToDate(v, defaultDelta) {
   if (v == "") {
@@ -168,6 +169,40 @@ function setupInstallRatio(eid, section) {
     });
 }
 
+function setupBranches(eid, section) {
+  var data = d3.map();
+  function acc(key, v) {
+    data.set(key, (data.get(key) || 0) + v);
+  }
+  iterDates().forEach(function(d) {
+    var day = gData.get(d);
+    if (!day) {
+      return;
+    }
+    if (eid in day.experiments) {
+      var active = day.experiments[eid].active;
+      if ((typeof active) == "number") {
+        acc("unknown", active);
+      } else {
+        Object.keys(active).forEach(function(branch) {
+          acc(branch, active[branch]);
+        });
+      }
+    }
+  });
+
+  data = data.entries();
+  data.sort(function(a, b) { return d3.descending(a.value, b.value); });
+
+  var total = d3.sum(data, function(d) { return d.value; });
+
+  var branchRows = section.select(".branchTable tbody").text("")
+    .selectAll("tr").data(data).enter().append("tr");
+  branchRows.append("td").text(function(d) { return d.key || "unset"; });
+  branchRows.append("td").text(function(d) { return d.value; });
+  branchRows.append("td").text(function(d) { return gPctFormat(d.value / total); });
+}
+
 function setupActivations(eid, section) {
   var activations = [];
   var rejections = d3.map();
@@ -276,6 +311,10 @@ function doGraph() {
   newsections.append("p").append("table")
     .classed({"activationTable": true, "data": true})
     .html("<thead><tr><td>Date<td>#<tbody>");
+  newsections.append("h3").text("Branches");
+  newsections.append("p").append("table")
+    .classed({"branchTable": true, "data": true})
+    .html("<thead><tr><td>Branch<td>#<td>%<tbody>");
   newsections.append("h3").text("Failed Activations");
   newsections.append("p").append("table")
     .classed({"failedTable": true, "data": true})
@@ -291,6 +330,7 @@ function doGraph() {
   sections.each(function(eid) {
     var section = d3.select(this);
     setupInstallRatio(eid, section);
+    setupBranches(eid, section);
     setupActivations(eid, section);
     setupTerminations(eid, section);
   });
