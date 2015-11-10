@@ -1,4 +1,4 @@
-var DATA_BASE = "https://s3-us-west-2.amazonaws.com/telemetry-public-analysis/experiments/data/experiments__DATE__-__CHANNEL__.json.gz";
+var DATA_BASE = "https://analysis-output.telemetry.mozilla.org/experiments/data/experiments__DATE__-__CHANNEL__.json.gz";
 
 var gStartDate, gEndDate;
 var gChannel;
